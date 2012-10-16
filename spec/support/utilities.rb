@@ -1,6 +1,3 @@
-module ApplicationHelper
-
-	# Returns the full title on a per-page basis.
 	def full_title(page_title)
 		base_title = "SocialWin Analytics"
 		if page_title.empty?
@@ -10,4 +7,4 @@ module ApplicationHelper
 		end
 	end
 
-end
+
