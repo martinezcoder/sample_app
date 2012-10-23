@@ -12,6 +12,7 @@
 class User < ActiveRecord::Base
   attr_accessible :email, :name
 	
-	validates :name, presence: true  # lo mismo que:  validates(:name, presence: true)
+	validates :name, presence: true, length: { maximum: 50 }  # lo mismo que:  validates(:name, presence: true, ...)
+	validates :email, presence: true
 
 end
