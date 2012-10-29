@@ -14,13 +14,17 @@ require 'spec_helper'
 describe User do
 
 	before do
-		@user = User.new(name: "test user", email: "user@test.es")
+		@user = User.new(name: "Example User", email: "user@example.com", password: "foobar", password_confirmation: "foobar")
 	end
 
 	subject { @user }
 
 	it { should respond_to(:name)  }
 	it { should respond_to(:email) }
+	it { should respond_to(:password_digest) }
+	it { should respond_to(:password) }
+	it { should respond_to(:password_confirmation) }
+	it { should respond_to(:authenticate) }
 
 	it { should be_valid }
 
@@ -59,6 +63,53 @@ describe User do
 				@user.email = email_bueno
 				@user.should be_valid
 			end
+		end
+	end
+
+	describe "cuando el email ya existe en BD" do
+		before do
+			usuario_repetido = @user.dup
+			usuario_repetido.email = usuario_repetido.email.upcase
+			usuario_repetido.save
+		end
+		
+		it { should_not be_valid } 
+	end
+	
+	describe "cuando el password esta vacio" do
+		before { @user.password = @user.password_confirmation = " " }
+		it { should_not be_valid }
+	end
+
+	describe "cuando el password no coincide con la confirmacion" do
+		before { @user.password_confirmation = "diferente" }
+		it { should_not be_valid }
+	end
+
+	describe "cuando el password es nulo" do
+		before { @user.password_confirmation = nil }
+		it { should_not be_valid }
+	end
+
+
+	describe "cuando el password es demasiado corto" do
+		before { @user.password = @user.password_confirmation = "a" * 5 }
+		it { should be_invalid }
+	end
+
+	describe "devuelve el valor de autenticarse" do
+		before { @user.save }
+		let(:found_user) { User.find_by_email(@user.email) }
+
+		describe "con password valido" do
+			it { should == found_user.authenticate(@user.password) }
+		end
+		
+		describe "con password invalido" do
+			let(:user_for_invalid_password) { found_user.authenticate("invalid") }
+
+			it { should_not == user_for_invalid_password }
+			specify { user_for_invalid_password.should be_false }
 		end
 	end
 
