@@ -9,7 +9,6 @@ describe "User Pages" do
 		before { visit signup_path }
 
 		describe "Texto de pagina" do
-
 			it { should have_selector('h1',	text: 'Registro') }
 			it { should have_selector('title', text: full_title('Registro')) }  
 		end
@@ -19,10 +18,20 @@ describe "User Pages" do
 	    let(:submit) { "Crear mi cuenta" }
 
 	    describe "con informacion invalida" do
+				before do
+					# no rellenamos nada de nada. Todos los campos a NIL
+				end
 	      it "should not create a user" do
 	        expect { click_button submit }.not_to change(User, :count)
 	      end
-	    end
+	    
+				describe "despues de clicar button Registro" do
+					before { click_button submit }
+					it { should have_selector('title', text: 'Registro') }
+					it { should have_content('error') }
+					it { should_not have_content('Password digest') }
+				end
+			end
 
 	    describe "con informacion valida" do
 	      before do
@@ -35,6 +44,14 @@ describe "User Pages" do
 	      it "should create a user" do
 	        expect { click_button submit }.to change(User, :count).by(1)
 	      end
+
+				describe "una vez registrado el usuario" do
+					before { click_button submit }
+					let(:user) { User.find_by_email("user@example.com") }
+					it { should have_selector('title', text: user.name) }
+					it { should have_selector('div.alert.alert-success') }
+				end
+
 	    end
 
 		end

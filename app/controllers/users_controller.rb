@@ -8,7 +8,7 @@ class UsersController < ApplicationController
 		@user = User.new(params[:user])
 		if @user.save
 			flash[:success] = "Bienvenido a SocialWin Analytics!"
-			redirect_to @user # ¿sería lo mismo poner:	render 'show'?
+			redirect_to @user # sería lo mismo poner:	render 'show'
 		else
 			render 'new'
 		end
