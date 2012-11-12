@@ -35,7 +35,7 @@ describe "User Pages" do
 
 	    describe "con informacion valida" do
 	      before do
-	        fill_in "Nombre",         with: "Example User"
+	        fill_in "Nombre",       with: "Example User"
 	        fill_in "Email",        with: "user@example.com"
 	        fill_in "Password",     with: "foobar"
 	        fill_in "Confirme el password", with: "foobar"
