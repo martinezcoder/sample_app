@@ -1,4 +1,6 @@
-	def full_title(page_title)
+include ApplicationHelper
+=begin
+def full_title(page_title)
 		base_title = "SocialWin Analytics"
 		if page_title.empty?
 			base_title
@@ -6,5 +8,5 @@
 			"#{base_title} | #{page_title}"
 		end
 	end
-
+=end
 
