@@ -21,7 +21,7 @@ describe "User Pages" do
 				before do
 					# no rellenamos nada de nada. Todos los campos a NIL
 				end
-	      it "should not create a user" do
+	      it "no deberia crear un usuario" do
 	        expect { click_button submit }.not_to change(User, :count)
 	      end
 	    
@@ -60,7 +60,7 @@ describe "User Pages" do
 	end
 
 
-	describe "User Show: Pagina de perfil" do
+	describe "User Show: Mostrando Pagina de perfil" do
 		# introducimos un usuario en la BD de test
 		let(:user) { FactoryGirl.create(:user) }
 
@@ -79,14 +79,56 @@ describe "User Pages" do
 	describe "User Index:" do
 	end
 
-	describe "User Edit:" do
-	end
+	describe "User Edit: Editando la Pagina de perfil" do
 
-	describe "User Update:" do
+		# introducimos un usuario en la BD de test
+		let(:user) { FactoryGirl.create(:user) }
+
+		before do  
+			sign_in user
+			visit edit_user_path(user) 
+			# En la tabla RESTful (7.1):
+			#   HTTP request     |     URI         |    Action    |    Named route         |    Purpose
+			#       GET          |  /users/1/edit  |     edit     |  edit_user_path(user)  |  page to edit user with id 1
+		end
+
+		it { should have_selector('h1', text: "Actualiza tu perfil") }
+		it { should have_selector('title', text: "Editar usuario") }
+		it { should have_link('change', href: 'http://gravatar.com/emails') }
+
+		describe ". User Update:" do
+			describe "con informacion invalida" do
+				before { click_button "Guardar cambios" }
+				it { should have_content('error')	}
+			end
+
+
+			describe "con informacion valida" do
+
+				let(:new_name)  { "New Name" }
+				let(:new_email) { "new@example.com" }
+
+				before do
+					fill_in "Nombre",								with: new_name
+					fill_in "Email",								with: new_email
+					fill_in "Password",							with: user.password
+					fill_in "Confirme el password",	with: user.password
+					click_button "Guardar cambios"
+				end
+
+				it { should have_selector('title', text: new_name) }
+				it { should have_selector('div.alert.alert-success') }
+				it { should have_link('Salir', href: signout_path) }
+				specify { user.reload.name.should  == new_name }
+				specify { user.reload.email.should == new_email }
+
+			end
+
+		end
 	end
 
 	describe "User Destroy:" do
 	end
-
+	
 end
 

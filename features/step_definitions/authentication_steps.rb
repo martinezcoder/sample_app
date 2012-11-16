@@ -11,8 +11,7 @@ Then /^he should see an error message$/ do
 end
 
 Given /^the user has an account$/ do
-	  @user = User.create(name: "Example User", email: "user@example.com",
-												                      password: "foobar", password_confirmation: "foobar")
+	@user = FactoryGirl.create(:user)
 end
 
 When /^the user submits valid signin information$/ do
