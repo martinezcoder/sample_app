@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-	before_filter :signed_in_user, 	only: [:edit, :update]
+	before_filter :signed_in_user, 	only: [:index, :edit, :update]
 	before_filter :correct_user, 		only: [:edit, :update]
 
 	def new   # se rellenan los campos de la vista
@@ -36,16 +36,17 @@ class UsersController < ApplicationController
 		end
 	end
 
+  def index
+    @users = User.paginate(page: params[:page], per_page: 10)
+  end
+
 	private
 
 		def signed_in_user
-			redirect_to signin_url, notice: "Por favor, inicie la sesion" unless signed_in?
-=begin
-			if !signed_in?
-			 	flash[:notice] = "Por favor, inicie la sesion."	
-				redirect_to signin_url
-			end
-=end
+		  unless signed_in?
+		    store_location
+  			redirect_to signin_url, notice: "Por favor, inicie la sesion" 
+  		end
 		end
 
 		def correct_user

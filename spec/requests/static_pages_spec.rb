@@ -11,8 +11,6 @@ describe "Static pages" do
 		should have_selector 'title', text: full_title('')
 		click_link "Ayuda"
 		should have_selector 'title', text: full_title('Ayuda')
-#		click_link "Entrar"
-#		should have_selector 'title', text: full_title('Ayuda')
 	end
 
 	it "Debe tener bien los enlaces del footer" do
