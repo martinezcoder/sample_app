@@ -2,9 +2,9 @@ require 'spec_helper'
 
 describe "User Pages" do
 
-	subject { page }
+  subject { page }
 
-	describe "User New: Pagina de registro" do
+	describe "User new: Pagina de registro" do
 
 		before { visit signup_path }
 
@@ -59,10 +59,11 @@ describe "User Pages" do
 
 	end
 
-
-	describe "User Show: Mostrando Pagina de perfil" do
+	describe "User show: Mostrando Pagina de perfil" do
 		# introducimos un usuario en la BD de test
 		let(:user) { FactoryGirl.create(:user) }
+    let!(:m1) { FactoryGirl.create(:micropost, user: user, content: "Foo") }
+    let!(:m2) { FactoryGirl.create(:micropost, user: user, content: "Bar") }
 
 		# En la tabla RESTful (7.1):
 		#   HTTP request     |     URI    |    Action    |    Named route    |    Purpose
@@ -71,15 +72,35 @@ describe "User Pages" do
 
 		it { should have_selector('h1', text: user.name) }
 		it { should have_selector('title', text: user.name) }
+
+    describe "microposts" do
+      it { should have_content(m1.content) }
+      it { should have_content(m2.content) }
+      it { should have_content(user.microposts.count) }
+    end
+
 	end
 
-	describe "User Create:" do
-	end
+  describe "User index" do
+    before do
+      sign_in FactoryGirl.create(:user)
+      FactoryGirl.create(:user, name: "Bob", email: "bob@example.com")
+      FactoryGirl.create(:user, name: "Ben", email: "ben@example.com")
+      visit users_path
+    end
 
-	describe "User Index:" do
-	end
+    it { should have_selector('title', text: 'All users') }
+    it { should have_selector('h1',    text: 'All users') }
 
-	describe "User Edit: Editando la Pagina de perfil" do
+    it "should list each user" do
+      User.all.each do |user|
+        page.should have_selector('li', text: user.name)
+      end
+    end
+  end
+
+
+	describe "User edit: Editando la Pagina de perfil" do
 
 		# introducimos un usuario en la BD de test
 		let(:user) { FactoryGirl.create(:user) }

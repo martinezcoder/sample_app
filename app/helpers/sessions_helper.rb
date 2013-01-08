@@ -36,4 +36,15 @@ module SessionsHelper
     session[:return_to] = request.url
   end
 
+
+  # Authorization functions 
+  
+  def signed_in_user
+    unless signed_in?
+      store_location
+      redirect_to signin_url, notice: "Por favor, inicie la sesion" 
+    end
+  end
+
+
 end

@@ -29,6 +29,7 @@ describe "Autenticacion:" do
 			before { sign_in user }
 
 			it { should have_selector('title', text: user.name) }
+      it { should have_link('Usuarios',    href: users_path) }
 			it { should have_link('Perfil', href: user_path(user)) }
 			it { should have_link('Ajustes', href: edit_user_path(user)) } 
 			it { should have_link('Salir', href: signout_path) }
@@ -49,7 +50,23 @@ describe "Autenticacion:" do
 		describe "Si no estas loggeado y " do
 
 			let(:user) { FactoryGirl.create(:user)  }
-				
+
+      describe "when attempting to visit a protected page" do
+        before do
+          visit edit_user_path(user)
+          fill_in "Email",    with: user.email
+          fill_in "Password", with: user.password
+          clicar_submit
+        end
+
+        describe "after signing in" do
+
+          it "should render the desired protected page" do
+            page.should have_selector('title', text: 'Editar usuario')
+          end
+        end
+      end
+      				
 			describe "intentas editar un usuario: debe ir a la pag de LOGIN " do
 				before { visit edit_user_path(user) }
 				it { should have_selector('title', text: 'Acceder') }
@@ -60,6 +77,22 @@ describe "Autenticacion:" do
 				specify { response.should redirect_to(signin_path) }
 			end
 		
+		  describe "visiting the user index" do
+        before { visit users_path }
+        it { should have_selector('title', text: 'Acceder') }
+      end
+      
+      describe "in the Microposts controller" do
+        describe "submitting to the create action" do
+          before { post microposts_path }
+          specify { response.should redirect_to(signin_path) }
+        end
+        describe "submitting to the destroy action" do
+          before { delete micropost_path(FactoryGirl.create(:micropost)) }
+          specify { response.should redirect_to(signin_path) }
+        end
+      end
+      
 		end
 
 		describe "Si eres un usuario incorrecto y " do

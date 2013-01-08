@@ -20,6 +20,7 @@ class UsersController < ApplicationController
 
 	def show
 		@user = User.find(params[:id])
+    @microposts = @user.microposts.paginate(page: params[:page])
 	end
 
 	def edit
@@ -46,22 +47,16 @@ class UsersController < ApplicationController
     flash[:success] = "User destroyed."
     redirect_to users_url    
   end
-  
-	private
-
-		def signed_in_user
-		  unless signed_in?
-		    store_location
-  			redirect_to signin_url, notice: "Por favor, inicie la sesion" 
-  		end
-		end
+    
+  private
 
 		def correct_user
 			@user = User.find(params[:id])
 			redirect_to(root_path) unless current_user?(@user)
 		end	
-
+  
     def admin_user
       redirect_to(root_path) unless current_user.admin?
     end
+  
 end
