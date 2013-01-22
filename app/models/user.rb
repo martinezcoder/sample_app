@@ -13,21 +13,22 @@ class User < ActiveRecord::Base
   attr_accessible :email, :name, :password, :password_confirmation
 	has_secure_password
 
-
   # Database relationships
   
+    # Microposts
   has_many :microposts, dependent: :destroy
 
+    # Following
   has_many :relationships, foreign_key: "follower_id", dependent: :destroy
   has_many :followed_users, through: :relationships, source: :followed
 
+    # Users who follow me
   has_many :reverse_relationships, foreign_key: "followed_id",
                                    class_name:  "Relationship",
                                    dependent:   :destroy
   has_many :followers, through: :reverse_relationships, source: :follower
 
   # Validations 
-  
 	validates :name,  presence: true, 
 										length: { maximum: 50 }  # lo mismo que:  validates(:name, presence: true, ...)
 
