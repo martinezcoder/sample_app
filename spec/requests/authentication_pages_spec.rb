@@ -51,6 +51,7 @@ describe "Autenticacion:" do
 
 			let(:user) { FactoryGirl.create(:user)  }
 
+
       describe "when attempting to visit a protected page" do
         before do
           visit edit_user_path(user)
@@ -64,24 +65,53 @@ describe "Autenticacion:" do
           it "should render the desired protected page" do
             page.should have_selector('title', text: 'Editar usuario')
           end
+
+          describe "when signing in again" do
+            before do
+              delete signout_path
+              visit signin_path
+              fill_in "Email", with: user.email
+              fill_in "Password", with: user.password
+              click_button "Acceder"
+            end
+
+            it "should render the default (profile) page" do
+              page.should have_selector('title', text: user.name)
+            end
+          end
         end
       end
-      				
-			describe "intentas editar un usuario: debe ir a la pag de LOGIN " do
-				before { visit edit_user_path(user) }
-				it { should have_selector('title', text: 'Acceder') }
-			end
 
-			describe "accedes a la accion PUT del controlador: debe ir a la pag de LOGIN " do
-				before { put user_path(user) }
-				specify { response.should redirect_to(signin_path) }
-			end
-		
-		  describe "visiting the user index" do
-        before { visit users_path }
-        it { should have_selector('title', text: 'Acceder') }
-      end
       
+      describe "in the Users controller" do
+
+        describe "visiting the edit page" do
+          before { visit edit_user_path(user) }
+          it { should have_selector('title', text: 'Acceder') }
+        end
+
+        describe "submitting to the update action" do
+          before { put user_path(user) }
+          specify { response.should redirect_to(signin_url) }
+        end
+
+        describe "visiting user index" do
+          before { visit users_path }
+          it { should have_selector('title', text: 'Acceder') }
+        end
+
+        describe "visiting the following page" do
+          before { visit following_user_path(user) }
+          it { should have_selector('title', text: 'Acceder') }
+        end
+
+        describe "visiting the followers page" do
+          before { visit followers_user_path(user) }
+          it { should have_selector('title', text: 'Acceder') }
+        end
+      end
+
+
       describe "in the Microposts controller" do
         describe "submitting to the create action" do
           before { post microposts_path }
@@ -92,7 +122,18 @@ describe "Autenticacion:" do
           specify { response.should redirect_to(signin_path) }
         end
       end
-      
+
+      describe "in the Relationships controller" do
+        describe "submitting to the create action" do
+          before { post relationships_path }
+          specify { response.should redirect_to(signin_path) }
+        end  
+        describe "submitting to the destroy action" do
+          before { delete relationship_path(1) }
+          specify { response.should redirect_to(signin_path) }          
+        end
+      end
+
 		end
 
 		describe "Si eres un usuario incorrecto y " do
@@ -111,8 +152,8 @@ describe "Autenticacion:" do
 				before { put user_path(wrong_user) }
 				specify { response.should redirect_to(root_path) }
 			end
-
 		end
+
 
 	end
 
