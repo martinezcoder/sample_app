@@ -10,6 +10,7 @@ class UsersController < ApplicationController
 	def create # cuando se le da al botón "Crear mi Cuenta"
 		@user = User.new(params[:user])
 		if @user.save
+      UserMailer.registration_confirmation(@user).deliver  
 			sign_in @user
 			flash[:success] = "Bienvenido a SocialWin Analytics!"
 			redirect_to root_url # @user # sería lo mismo poner:	render 'show'
